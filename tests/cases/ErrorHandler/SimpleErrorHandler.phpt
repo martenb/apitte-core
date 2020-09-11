@@ -14,8 +14,9 @@ require_once __DIR__ . '/../../bootstrap.php';
 
 // Error conversion - api exception
 test(function (): void {
+	$request = new ApiRequest(Psr7ServerRequestFactory::fromSuperGlobal());
 	$handler = new SimpleErrorHandler();
-	$response = $handler->handle(new ClientErrorException('test', ApiResponse::S404_NOT_FOUND, null, ['foo' => 'bar']));
+	$response = $handler->handle(new ClientErrorException('test', ApiResponse::S404_NOT_FOUND, null, ['foo' => 'bar']), $request);
 
 	Assert::same(
 		[
@@ -30,8 +31,9 @@ test(function (): void {
 
 // Error conversion - generic exception
 test(function (): void {
+	$request = new ApiRequest(Psr7ServerRequestFactory::fromSuperGlobal());
 	$handler = new SimpleErrorHandler();
-	$response = $handler->handle(new Exception('test', 400));
+	$response = $handler->handle(new Exception('test', 400), $request);
 
 	Assert::same(
 		[
@@ -45,14 +47,15 @@ test(function (): void {
 
 // Snapshot
 test(function (): void {
+	$request = new ApiRequest(Psr7ServerRequestFactory::fromSuperGlobal());
 	$handler = new SimpleErrorHandler();
 	$originalResponse = new ApiResponse(Psr7ResponseFactory::fromGlobal());
 
 	$response = $handler->handle(new SnapshotException(
 		new ClientErrorException('test'),
-		new ApiRequest(Psr7ServerRequestFactory::fromSuperGlobal()),
+		$request,
 		$originalResponse
-	));
+	), $request);
 
 	Assert::same($originalResponse, $response);
 });
@@ -63,7 +66,8 @@ test(function (): void {
 	$handler->setCatchException(false);
 
 	Assert::exception(function () use ($handler): void {
-		$handler->handle(new ClientErrorException('test'));
+		$request = new ApiRequest(Psr7ServerRequestFactory::fromSuperGlobal());
+		$handler->handle(new ClientErrorException('test'), $request);
 	}, ClientErrorException::class, 'test');
 });
 
@@ -73,10 +77,11 @@ test(function (): void {
 	$handler->setCatchException(false);
 
 	Assert::exception(function () use ($handler): void {
+		$request = new ApiRequest(Psr7ServerRequestFactory::fromSuperGlobal());
 		$handler->handle(new SnapshotException(
 			new ClientErrorException('test'),
-			new ApiRequest(Psr7ServerRequestFactory::fromSuperGlobal()),
+			$request,
 			new ApiResponse(Psr7ResponseFactory::fromGlobal())
-		));
+		), $request);
 	}, ClientErrorException::class, 'test');
 });

@@ -34,7 +34,7 @@ abstract class BaseApplication implements IApplication
 		try {
 			$response = $this->dispatch($request);
 		} catch (Throwable $exception) {
-			$response = $this->errorHandler->handle($exception);
+			$response = $this->errorHandler->handle($exception, $request);
 		}
 
 		$this->sendResponse($response);

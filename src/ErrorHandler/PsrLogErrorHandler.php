@@ -5,6 +5,7 @@ namespace Apitte\Core\ErrorHandler;
 use Apitte\Core\Exception\Api\ServerErrorException;
 use Apitte\Core\Exception\ApiException;
 use Apitte\Core\Exception\Runtime\SnapshotException;
+use Apitte\Core\Http\ApiRequest;
 use Apitte\Core\Http\ApiResponse;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -21,7 +22,7 @@ class PsrLogErrorHandler extends SimpleErrorHandler
 		$this->logger = $logger;
 	}
 
-	public function handle(Throwable $error): ApiResponse
+	public function handle(Throwable $error, ApiRequest $request): ApiResponse
 	{
 		// Unwrap error from snapshot for logging
 		$originalError = $error;
@@ -42,7 +43,7 @@ class PsrLogErrorHandler extends SimpleErrorHandler
 			$this->logger->log($level, $previous->getMessage(), ['exception' => $previous]);
 		}
 
-		return parent::handle($originalError);
+		return parent::handle($originalError, $request);
 	}
 
 }

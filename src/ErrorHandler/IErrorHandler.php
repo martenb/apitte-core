@@ -2,6 +2,7 @@
 
 namespace Apitte\Core\ErrorHandler;
 
+use Apitte\Core\Http\ApiRequest;
 use Apitte\Core\Http\ApiResponse;
 use Throwable;
 
@@ -11,6 +12,6 @@ interface IErrorHandler
 	/**
 	 * Log error and generate response
 	 */
-	public function handle(Throwable $error): ApiResponse;
+	public function handle(Throwable $error, ApiRequest $request): ApiResponse;
 
 }
